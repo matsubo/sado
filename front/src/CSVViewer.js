@@ -8,15 +8,20 @@ const CSVViewer = () => {
     // LocalStorage から初期値を読み込む
     return localStorage.getItem('csvViewerSearchTerm') || '';
   });
+  const [flashMessage, setFlashMessage] = useState('');
+
+  const fetchData = async () => {
+    const timestamp = new Date().getTime();
+    const response = await fetch(`https://gist.githubusercontent.com/matsubo/b81e4b71f3ea280278ef532ec6a1c781/raw/8da54dd71981e99be022f47bd33bd2b6cdb37ec5/sado.csv?timestamp=${timestamp}`);
+    const text = await response.text();
+    const results = Papa.parse(text, { header: true, encoding: "UTF-8" });
+    setData(results.data);
+    setHeaders(results.meta.fields);
+    setFlashMessage('再読込しました');
+    setTimeout(() => setFlashMessage(''), 2000);
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch('https://gist.githubusercontent.com/matsubo/b81e4b71f3ea280278ef532ec6a1c781/raw/8da54dd71981e99be022f47bd33bd2b6cdb37ec5/sado.csv');
-      const text = await response.text();
-      const results = Papa.parse(text, { header: true, encoding: "UTF-8" });
-      setData(results.data);
-      setHeaders(results.meta.fields);
-    };
     fetchData();
   }, []);
 
@@ -37,13 +42,26 @@ const CSVViewer = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <input
-        type="text"
-        placeholder="検索... (スペース区切りでOR検索)"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full p-2 mb-4 border border-gray-300 rounded"
-      />
+      <div className="flex justify-between mb-4">
+        <input
+          type="text"
+          placeholder="検索... (スペース区切りでOR検索)"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded"
+        />
+        <button
+          onClick={fetchData}
+          className="ml-4 p-2 bg-blue-500 text-white rounded-sm" // Modified: Added rounded-sm class
+        >
+          再読み込み
+        </button>
+      </div>
+      {flashMessage && (
+        <div className="mb-4 p-2 bg-green-500 text-white rounded">
+          {flashMessage}
+        </div>
+      )}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white">
           <thead>
