@@ -1,0 +1,8 @@
+services:
+  gist_updater:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+
