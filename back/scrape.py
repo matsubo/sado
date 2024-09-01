@@ -20,7 +20,7 @@ def get_all_pages_data(base_url):
     
     while page <= 5:
         print(page)
-        url = f"{base_url}?p={page}"
+        url = f"{base_url}?di=1&p={page}"
         df = get_table_data(url)
         
         if df is None or df.empty:
