@@ -12,7 +12,7 @@ const CSVViewer = () => {
 
   const fetchData = async () => {
     const timestamp = Math.floor((new Date().getTime()/(1000*60)));
-    const response = await fetch(`https://static.teraren.com/sado/combined_table_data.csv?timestamp=${timestamp}`);
+    const response = await fetch(`https://gist.githubusercontent.com/matsubo/b81e4b71f3ea280278ef532ec6a1c781/raw/8da54dd71981e99be022f47bd33bd2b6cdb37ec5/sado.csv?timestamp=${timestamp}`);
     const text = await response.text();
     const results = Papa.parse(text, { header: true, encoding: "UTF-8" });
     setData(results.data);
