@@ -67,7 +67,7 @@ const CSVViewer = () => {
           <thead>
             <tr className="bg-gray-100">
               {headers.map((header, index) => (
-                <th key={index} className="px-4 py-2 text-left">{header}</th>
+                <th key={index} className="px-2 py-2 text-left">{header}</th>
               ))}
             </tr>
           </thead>
@@ -75,7 +75,7 @@ const CSVViewer = () => {
             {filteredData.map((row, rowIndex) => (
               <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                 {headers.map((header, cellIndex) => (
-                  <td key={cellIndex} className="border px-4 py-2">{row[header]}</td>
+                  <td key={cellIndex} className={`border px-2 py-2 whitespace-nowrap ${row[header] === '女' ? 'bg-pink-200' : ''}`}>{row[header]}</td> // Modified: Added whitespace-nowrap class
                 ))}
               </tr>
             ))}
