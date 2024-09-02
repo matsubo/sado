@@ -40,6 +40,37 @@ const CSVViewer = () => {
     );
   });
 
+  const [hoveredColumn, setHoveredColumn] = useState(null);
+
+  const calculateTimeDifference = (row, cellIndex) => {
+    row = Object.values(row);
+    const previousTime = new Date('2024-09-01 ' + row[cellIndex - 1]);
+    const currentTime = new Date('2024-09-01 ' + row[cellIndex]);
+    const difference = currentTime - previousTime;
+    return difference;
+  };
+
+  const formatTimeDifference = (difference) => {
+    const hours = Math.floor(difference / (1000 * 60 * 60));
+    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const [clickedColumn, setClickedColumn] = useState(null);
+
+  const [toggleColumn, setToggleColumn] = useState(null);
+
+  const handleCellClick = (cellIndex) => {
+    if (cellIndex < 6) { return }
+    if (22 < cellIndex) { return }
+    if (toggleColumn === cellIndex) {
+      setToggleColumn(null);
+    } else {
+      setToggleColumn(cellIndex);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between mb-4">
@@ -52,7 +83,7 @@ const CSVViewer = () => {
         />
         <button
           onClick={fetchData}
-          className="ml-4 p-2 bg-blue-500 text-white rounded-sm" // Modified: Added rounded-sm class
+          className="ml-4 p-2 bg-blue-500 text-white rounded-sm"
         >
           再読み込み
         </button>
@@ -67,15 +98,37 @@ const CSVViewer = () => {
           <thead>
             <tr className="bg-gray-100">
               {headers.map((header, index) => (
-                <th key={index} className="px-2 py-2 text-left">{header}</th>
+                <th
+                  key={index}
+                  className="px-2 py-2 text-left"
+                >
+                  {header}
+                </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {filteredData.map((row, rowIndex) => (
-              <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+              <tr
+                key={rowIndex}
+                className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}
+              >
                 {headers.map((header, cellIndex) => (
-                  <td key={cellIndex} className={`border px-2 py-2 whitespace-nowrap ${row[header] === '女' ? 'bg-pink-200' : ''}`}>{row[header]}</td> // Modified: Added whitespace-nowrap class
+                  <td
+                    key={cellIndex}
+                    className={`border px-2 py-2 whitespace-nowrap ${
+                      row[header] === '女' ? 'bg-pink-200' : ''
+                    }`}
+                    onClick={() => handleCellClick(cellIndex)}
+                  >
+                    {toggleColumn === cellIndex && cellIndex > 0 ? (
+                      <span className='bg-pink-100'>
+                        {formatTimeDifference(calculateTimeDifference(row, cellIndex))} (lap)
+                      </span>
+                    ) : (
+                      row[header]
+                    )}
+                  </td>
                 ))}
               </tr>
             ))}
