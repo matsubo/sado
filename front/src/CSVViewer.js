@@ -5,7 +5,6 @@ const CSVViewer = () => {
   const [data, setData] = useState([]);
   const [headers, setHeaders] = useState([]);
   const [searchTerm, setSearchTerm] = useState(() => {
-    // LocalStorage から初期値を読み込む
     return localStorage.getItem('csvViewerSearchTerm') || '';
   });
   const [flashMessage, setFlashMessage] = useState('');
@@ -25,7 +24,6 @@ const CSVViewer = () => {
     fetchData();
   }, []);
 
-  // searchTerm が変更されたときに LocalStorage に保存
   useEffect(() => {
     localStorage.setItem('csvViewerSearchTerm', searchTerm);
   }, [searchTerm]);
