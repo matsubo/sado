@@ -1,6 +1,9 @@
 # Sado triathlon type A athlete tracker
 
-![](2024-09-02-00-54-42.png)
+
+## Architecture
+
+![](2024-09-02-11-39-25.png)
 
 ## backend
 
