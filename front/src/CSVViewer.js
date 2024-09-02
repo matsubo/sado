@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
+import dayjs from 'dayjs';
+
 
 const CSVViewer = () => {
   const [data, setData] = useState([]);
@@ -42,8 +44,8 @@ const CSVViewer = () => {
 
   const calculateTimeDifference = (row, cellIndex) => {
     row = Object.values(row);
-    const previousTime = new Date('2024-09-01 ' + row[cellIndex - 1]);
-    const currentTime = new Date('2024-09-01 ' + row[cellIndex]);
+    const previousTime = dayjs('2024-09-01 ' + row[cellIndex - 1]);
+    const currentTime = dayjs('2024-09-01 ' + row[cellIndex]);
     const difference = currentTime - previousTime;
     return difference;
   };
