@@ -1,11 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+import CSVViewer from './CSVViewer';
+import { Analytics } from "@vercel/analytics/react"
+import Usage from './Usage';
+import UsageImportant from './UsageImportant';
+
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <div className="App p-2">
+      <UsageImportant/>
+      <CSVViewer />
+      <Usage/>
+      <Analytics/>
+    </div>
   </React.StrictMode>
 );
