@@ -1,5 +1,5 @@
 import StrictMode from 'react';
-import createRoot from 'react-dom/client';
+import ReactDOM from 'react-dom/client';
 import './index.css';
 import CSVViewer from './CSVViewer';
 import { Analytics } from "@vercel/analytics/react"
@@ -8,7 +8,7 @@ import UsageImportant from './UsageImportant';
 
 
 
-const root = createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <StrictMode>
     <div className="App p-2">
