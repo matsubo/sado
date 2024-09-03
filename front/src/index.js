@@ -1,4 +1,4 @@
-import StrictMode from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import CSVViewer from './CSVViewer';
@@ -10,12 +10,12 @@ import UsageImportant from './UsageImportant';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <StrictMode>
+  <React.StrictMode>
     <div className="App p-2">
       <UsageImportant/>
       <CSVViewer />
       <Usage/>
       <Analytics/>
     </div>
-  </StrictMode>
+  </React.StrictMode>
 );
