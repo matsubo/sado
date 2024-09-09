@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 
 
 const CSVViewer = () => {
+  const [selectedType, setSelectedType] = useState('1');
   const [data, setData] = useState([]);
   const [headers, setHeaders] = useState([]);
   const [searchTerm, setSearchTerm] = useState(() => {
@@ -11,17 +12,19 @@ const CSVViewer = () => {
   });
   const [flashMessage, setFlashMessage] = useState('');
 
-  const fetchData = async () => {
+
+
+  const fetchData = async (type) => {
     const timestamp = Math.floor((new Date().getTime()/(1000*60)));
-    const response = await fetch(`https://gist.githubusercontent.com/matsubo/b81e4b71f3ea280278ef532ec6a1c781/raw/sado_${selectedType}.csv?timestamp=${timestamp}`);    const text = await response.text();
+    const response = await fetch(`https://gist.githubusercontent.com/matsubo/b81e4b71f3ea280278ef532ec6a1c781/raw/sado_${type}.csv?timestamp=${timestamp}`);    const text = await response.text();
     const results = Papa.parse(text, { header: true, encoding: "UTF-8" });
     setData(results.data);
     setHeaders(results.meta.fields);
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+     fetchData(selectedType);
+  }, [selectedType]);
 
   useEffect(() => {
     localStorage.setItem('csvViewerSearchTerm', searchTerm);
@@ -80,10 +83,8 @@ const CSVViewer = () => {
 
   const handleTypeChange = (e) => {
     setSelectedType(e.target.value);
-    fetchData();
   };
 
-  const [selectedType, setSelectedType] = useState('1');
 
   return (
     <div className="container mx-auto p-4">
