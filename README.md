@@ -1,5 +1,14 @@
 # Sado triathlon type A athlete tracker
 
+Athelete tracer for Sado Triathlon 2024.
+
+## Screenshot
+
+![image](https://github.com/user-attachments/assets/ad7bbe45-1ddd-41e2-896b-d59c9533d4c9)
+
+## Deployment
+
+https://sado-xi.vercel.app/
 
 ## Architecture
 
