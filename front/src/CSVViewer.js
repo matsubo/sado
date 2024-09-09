@@ -87,7 +87,7 @@ const CSVViewer = () => {
   const renderButton = (type, label) => {
     return (
       <button
-        className={`m-2 px-2 bg-blue-500 text-white rounded-sm ${selectedType === type ? 'bg-blue-700' : ''}`}
+        className={`btn btn-sm mx-2 ${selectedType === type ? 'btn-accent' : ''}`}
         name="type"
         value={type}
         onClick={handleTypeChange}
@@ -105,34 +105,45 @@ const CSVViewer = () => {
         {renderButton('3', 'Type B')}
         {renderButton('4', 'Type RB')}
       </div>
-      <div className="flex justify-between mb-4">
+      <div className="flex justify-between my-4">
         <input
           type="text"
           placeholder="検索... (スペース区切りでOR検索)"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded"
+          className="input input-bordered w-full"
         />
         <button
           onClick={handleButtonClick}
-          className="ml-4 p-2 bg-blue-500 text-white rounded-sm"
+          className="ml-2 btn btn-secondary"
         >
           再読み込み
         </button>
       </div>
       {flashMessage && (
-        <div className="mb-4 p-2 bg-green-500 text-white rounded">
-          {flashMessage}
-        </div>
+        <div role="alert" class="alert alert-success">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6 shrink-0 stroke-current"
+          fill="none"
+          viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>{flashMessage}</span>
+      </div>
       )}
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white">
+        <table className="table min-w-full">
           <thead>
-            <tr className="bg-gray-100">
+            <tr className="">
               {headers.map((header, index) => (
                 <th
                   key={index}
-                  className="px-2 py-2 text-left"
+                  className="text-left"
                 >
                   {header}
                 </th>
@@ -143,18 +154,18 @@ const CSVViewer = () => {
             {filteredData.map((row, rowIndex) => (
               <tr
                 key={rowIndex}
-                className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}
+                className={`hover ${rowIndex % 2 === 0 ? 'bg-base-200' : ''}`}
               >
                 {headers.map((header, cellIndex) => (
                   <td
                     key={cellIndex}
-                    className={`border px-2 py-2 whitespace-nowrap ${
-                      row[header] === '女' ? 'bg-pink-200' : ''
+                    className={`whitespace-nowrap ${
+                      row[header] === '女' ? 'text-secondary' : ''
                     } ${highlightedCell === cellIndex ? 'bg-yellow-200' : ''}`}
                     onClick={() => handleCellClick(cellIndex)}
                   >
                     {toggleColumn === cellIndex && cellIndex > 0 ? (
-                      <span className='bg-pink-100'>
+                      <span className='text-secondary'>
                         {formatTimeDifference(calculateTimeDifference(row, cellIndex))} (lap)
                       </span>
                     ) : (
