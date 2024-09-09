@@ -7,13 +7,13 @@ Athelete tracer for Sado Triathlon 2024.
 
 <img width="909" alt="image" src="https://github.com/user-attachments/assets/2f4c2ea9-1163-4c82-9e47-bf0bb043c388">
 
-## Deployment
+## Production URL
 
 https://sado-xi.vercel.app/
 
 ## Architecture
 
-![](2024-09-02-11-39-25.png)
+<img width="1075" alt="image" src="https://github.com/user-attachments/assets/c2451edf-6dec-4597-b734-b668fe8b4f2f">
 
 ## backend
 
