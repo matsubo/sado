@@ -4,7 +4,8 @@ Athelete tracer for Sado Triathlon 2024.
 
 ## Screenshot
 
-![image](https://github.com/user-attachments/assets/ad7bbe45-1ddd-41e2-896b-d59c9533d4c9)
+
+<img width="909" alt="image" src="https://github.com/user-attachments/assets/2f4c2ea9-1163-4c82-9e47-bf0bb043c388">
 
 ## Deployment
 
