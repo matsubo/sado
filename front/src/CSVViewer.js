@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 import dayjs from 'dayjs';
 
-
 const CSVViewer = () => {
   const [selectedType, setSelectedType] = useState('1');
   const [data, setData] = useState([]);
@@ -12,18 +11,17 @@ const CSVViewer = () => {
   });
   const [flashMessage, setFlashMessage] = useState('');
 
-
-
   const fetchData = async (type) => {
     const timestamp = Math.floor((new Date().getTime()/(1000*60)));
-    const response = await fetch(`https://gist.githubusercontent.com/matsubo/b81e4b71f3ea280278ef532ec6a1c781/raw/sado_${type}.csv?timestamp=${timestamp}`);    const text = await response.text();
+    const response = await fetch(`https://gist.githubusercontent.com/matsubo/b81e4b71f3ea280278ef532ec6a1c781/raw/sado_${type}.csv?timestamp=${timestamp}`);
+    const text = await response.text();
     const results = Papa.parse(text, { header: true, encoding: "UTF-8" });
     setData(results.data);
-    setHeaders(results.meta.fields);
+    setHeaders(results.meta.fields); // ヘッダーを更新
   };
 
   useEffect(() => {
-     fetchData(selectedType);
+    fetchData(selectedType);
   }, [selectedType]);
 
   useEffect(() => {
@@ -73,18 +71,18 @@ const CSVViewer = () => {
 
   const [highlightedCell, setHighlightedCell] = useState(null);
 
-
   const handleButtonClick = async () => {
-    fetchData().then(() => {
+    fetchData(selectedType).then(() => {
       setFlashMessage('再読込しました');
       setTimeout(() => setFlashMessage(''), 2000);
     });
   };
 
   const handleTypeChange = (e) => {
-    setSelectedType(e.target.value);
+    const newType = e.target.value;
+    setSelectedType(newType);
+    fetchData(newType);
   };
-
 
   return (
     <div className="container mx-auto p-4">
