@@ -59,17 +59,29 @@ const CSVViewer = () => {
 
   const [toggleColumn, setToggleColumn] = useState(null);
 
-  const handleCellClick = (cellIndex) => {
-    if (cellIndex < 6) { return }
-    if (22 < cellIndex) { return }
+  const handleCellClick = (rowIndex, cellIndex) => {
+
+    if (cellIndex < 5) {
+      document.querySelector('tbody tr:nth-child(' + (rowIndex + 1) + ')').classList.toggle('border-primary');
+    }
+
+
+    if (selectedType == '1' || selectedType == '2') {
+      if (cellIndex < 6) { return }
+      if (22 < cellIndex) { return }
+    } else if (selectedType == '3' || selectedType == '4') {
+      if (cellIndex < 6) { return }
+      if (15 < cellIndex) { return }
+    }
+
     if (toggleColumn === cellIndex) {
       setToggleColumn(null);
     } else {
       setToggleColumn(cellIndex);
     }
-  };
 
-  const [highlightedCell, setHighlightedCell] = useState(null);
+
+  };
 
   const handleButtonClick = async () => {
     fetchData(selectedType).then(() => {
@@ -121,16 +133,16 @@ const CSVViewer = () => {
         </button>
       </div>
       {flashMessage && (
-        <div role="alert" class="alert alert-success">
+        <div role="alert" className="alert alert-success">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6 shrink-0 stroke-current"
+          className="h-6 w-6 shrink-0 stroke-current"
           fill="none"
           viewBox="0 0 24 24">
           <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <span>{flashMessage}</span>
@@ -161,8 +173,8 @@ const CSVViewer = () => {
                     key={cellIndex}
                     className={`whitespace-nowrap ${
                       row[header] === '女' ? 'text-secondary' : ''
-                    } ${highlightedCell === cellIndex ? 'bg-yellow-200' : ''}`}
-                    onClick={() => handleCellClick(cellIndex)}
+                    }`}
+                    onClick={() => handleCellClick(rowIndex, cellIndex)}
                   >
                     {toggleColumn === cellIndex && cellIndex > 0 ? (
                       <span className='text-secondary'>
