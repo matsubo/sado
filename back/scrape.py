@@ -13,14 +13,14 @@ def get_table_data(url):
         return df
     return None
 
-def get_all_pages_data(base_url):
+def get_all_pages_data(base_url, di=1):
     all_data = []
     page = 1
 
     
     while page <= 5:
-        print(page)
-        url = f"{base_url}?di=1&p={page}"
+        url = f"{base_url}?di={di}&p={page}"
+        print(url)
         df = get_table_data(url)
         
         if df is None or df.empty:
@@ -33,9 +33,9 @@ def get_all_pages_data(base_url):
 
 # メインの処理
 base_url = "https://systemway.jp/24sado"
-combined_data = get_all_pages_data(base_url)
 
+for di in range(1, 5):
+    combined_data = get_all_pages_data(base_url, di)
+    combined_data.to_csv(f"combined_table_data_{di}.csv", index=False, encoding='utf-8-sig')
 
-# CSVファイルとして保存（オプション）
-combined_data.to_csv("combined_table_data.csv", index=False, encoding='utf-8-sig')
 

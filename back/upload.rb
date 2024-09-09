@@ -8,8 +8,8 @@ Dotenv.load
 github_token = ENV['GITHUB_TOKEN']
 
 if github_token.nil? || github_token.empty?
-  puts "GitHub Personal Access Tokenが設定されていません。"
-  puts "GITHUB_TOKEN環境変数を設定してください。"
+  puts 'GitHub Personal Access Tokenが設定されていません。'
+  puts 'GITHUB_TOKEN環境変数を設定してください。'
   exit 1
 end
 
@@ -19,27 +19,19 @@ client = Octokit::Client.new(access_token: github_token)
 # 更新するGistのID
 gist_id = 'b81e4b71f3ea280278ef532ec6a1c781'
 
-# 更新するファイル名
-filename = 'combined_table_data.csv'
 
-begin
-  # ファイルの内容を読み込む
-  file_content = File.read(filename)
+# Gistの更新
+files = {
+  'sado_1.csv' => 'combined_table_data_1.csv',
+  'sado_2.csv' => 'combined_table_data_2.csv',
+  'sado_3.csv' => 'combined_table_data_3.csv',
+  'sado_4.csv' => 'combined_table_data_4.csv'
+}
 
-  # Gistの更新
-  gist = client.edit_gist(gist_id, {
-    files: {
-      'sado.csv' => { content: file_content }
-    }
-  })
-
-  puts "Gistが正常に更新されました。"
-  puts "更新されたGistのURL: #{gist.html_url}"
-rescue Octokit::Error => e
-  puts "GitHubとの通信中にエラーが発生しました: #{e.message}"
-rescue Errno::ENOENT
-  puts "ファイル '#{filename}' が見つかりません。"
-rescue => e
-  puts "予期せぬエラーが発生しました: #{e.message}"
+files.each do |new_filename, old_filename|
+  files[new_filename] = { content: File.read(old_filename) }
 end
 
+client.edit_gist(gist_id, { files: files })
+
+puts 'Gistが正常に更新されました。'
