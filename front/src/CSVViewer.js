@@ -84,41 +84,26 @@ const CSVViewer = () => {
     fetchData(newType);
   };
 
+  const renderButton = (type, label) => {
+    return (
+      <button
+        className={`m-2 px-2 bg-blue-500 text-white rounded-sm ${selectedType === type ? 'bg-blue-700' : ''}`}
+        name="type"
+        value={type}
+        onClick={handleTypeChange}
+      >
+        {label}
+      </button>
+    );
+  };
+
   return (
     <div className="container mx-auto p-4">
       <div className="flex">
-        <button
-          className={`m-2 p-2 bg-blue-500 text-white rounded-sm ${selectedType === '1' ? 'bg-blue-700' : ''}`}
-          name="type"
-          value="1"
-          onClick={handleTypeChange}
-        >
-          Type A
-        </button>
-        <button
-          className={`m-2 p-2 bg-blue-500 text-white rounded-sm ${selectedType === '2' ? 'bg-blue-700' : ''}`}
-          name="type"
-          value="2"
-          onClick={handleTypeChange}
-        >
-          Type RA
-        </button>
-        <button
-          className={`m-2 p-2 bg-blue-500 text-white rounded-sm ${selectedType === '3' ? 'bg-blue-700' : ''}`}
-          name="type"
-          value="3"
-          onClick={handleTypeChange}
-        >
-          Type B
-        </button>
-        <button
-          className={`m-2 p-2 bg-blue-500 text-white rounded-sm ${selectedType === '4' ? 'bg-blue-700' : ''}`}
-          name="type"
-          value="4"
-          onClick={handleTypeChange}
-        >
-          Type RB
-        </button>
+        {renderButton('1', 'Type A')}
+        {renderButton('2', 'Type RA')}
+        {renderButton('3', 'Type B')}
+        {renderButton('4', 'Type RB')}
       </div>
       <div className="flex justify-between mb-4">
         <input
