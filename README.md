@@ -1,4 +1,4 @@
-# Sado triathlon type A athlete tracker
+# Sado triathlon 2024 athlete tracker
 
 Athelete tracer for Sado Triathlon 2024.
 
