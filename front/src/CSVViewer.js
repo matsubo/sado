@@ -39,11 +39,31 @@ const CSVViewer = () => {
     });
   }, [data, searchTerm]);
 
+  const customSortTypes = {
+    alphanumeric: (rowA, rowB, columnId, desc) => {
+      const a = rowA.values[columnId];
+      const b = rowB.values[columnId];
+
+      // 空の値をソートの最後に
+      if (a === '' && b === '') return 0;
+      if (a === '') return 1;
+      if (b === '') return -1;
+
+      // 通常のソート
+      let a_time = dayjs('2024-09-01 ' + a).unix();
+      let b_time = dayjs('2024-09-01 ' + b).unix();
+      if (a_time < b_time) return desc ? 1 : -1;
+      if (a_time > b_time) return desc ? -1 : 1;
+      return 0;
+    },
+  };
+
   const columns = useMemo(() => {
     if (data.length === 0) return [];
     return Object.keys(data[0]).map(key => ({
       Header: key,
       accessor: key,
+      sortType: 'alphanumeric',
       Cell: ({ value, cell }) => {
         const rowIndex = cell.row.index;
         const cellIndex = cell.column.index;
@@ -99,6 +119,7 @@ const CSVViewer = () => {
     {
       columns,
       data: filteredData,
+      sortTypes: customSortTypes,
     },
     useSortBy
   );
