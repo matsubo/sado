@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useTable, useSortBy } from 'react-table';
 import Papa from 'papaparse';
 import dayjs from 'dayjs';
 
 const CSVViewer = () => {
   const [selectedType, setSelectedType] = useState('1');
   const [data, setData] = useState([]);
-  const [headers, setHeaders] = useState([]);
   const [searchTerm, setSearchTerm] = useState(() => {
     return localStorage.getItem('csvViewerSearchTerm') || '';
   });
@@ -17,7 +17,6 @@ const CSVViewer = () => {
     const text = await response.text();
     const results = Papa.parse(text, { header: true, encoding: "UTF-8" });
     setData(results.data);
-    setHeaders(results.meta.fields); // ヘッダーを更新
   };
 
   useEffect(() => {
@@ -28,69 +27,81 @@ const CSVViewer = () => {
     localStorage.setItem('csvViewerSearchTerm', searchTerm);
   }, [searchTerm]);
 
-  const filteredData = data.filter(row => {
-    if (searchTerm.trim() === '') return true;
-    const searchTerms = searchTerm.toLowerCase().split(' ').filter(term => term !== '');
-    return searchTerms.some(term =>
-      Object.values(row).some(value =>
-        value.toString().toLowerCase().includes(term)
-      )
-    );
-  });
+  const filteredData = useMemo(() => {
+    return data.filter(row => {
+      if (searchTerm.trim() === '') return true;
+      const searchTerms = searchTerm.toLowerCase().split(' ').filter(term => term !== '');
+      return searchTerms.some(term =>
+        Object.values(row).some(value =>
+          value.toString().toLowerCase().includes(term)
+        )
+      );
+    });
+  }, [data, searchTerm]);
 
-  const [hoveredColumn, setHoveredColumn] = useState(null);
+  const columns = useMemo(() => {
+    if (data.length === 0) return [];
+    return Object.keys(data[0]).map(key => ({
+      Header: key,
+      accessor: key,
+      Cell: ({ value, cell }) => {
+        const rowIndex = cell.row.index;
+        const cellIndex = cell.column.index;
 
-  const calculateTimeDifference = (row, cellIndex) => {
-    row = Object.values(row);
-    const previousTime = dayjs('2024-09-01 ' + row[cellIndex - 1]);
-    const currentTime = dayjs('2024-09-01 ' + row[cellIndex]);
-    const difference = currentTime - previousTime;
-    return difference;
-  };
+        if (value === '女') {
+          return <span className="text-secondary">{value}</span>;
+        }
 
-  const formatTimeDifference = (difference) => {
-    const hours = Math.floor(difference / (1000 * 60 * 60));
-    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
+        if ((selectedType === '1' || selectedType === '2') && cellIndex > 22) {
+          return value;
+        }
+        if ((selectedType === '3' || selectedType === '4') && cellIndex > 15) {
+          return value;
+        }
 
-  const [clickedColumn, setClickedColumn] = useState(null);
+        if ((selectedType === '1' || selectedType === '3') && cellIndex < 6) {
+          return value;
+        }
+        if ((selectedType === '2' || selectedType === '4') && cellIndex < 4) {
+          return value;
+        }
 
-  const [toggleColumn, setToggleColumn] = useState(null);
+        if (cellIndex > 0) {
+          const row = Object.values(filteredData[rowIndex]);
+          const previousTime = dayjs('2024-09-01 ' + row[cellIndex - 1]);
+          const currentTime = dayjs('2024-09-01 ' + value);
+          const difference = currentTime - previousTime;
+          const formattedDifference = formatTimeDifference(difference);
+          
+          return (
+            <span>
+              {value}
+              <br />
+              <span className="text-secondary">
+                {formattedDifference} (lap)
+              </span>
+            </span>
+          );
+        }
 
-  const handleCellClick = (rowIndex, cellIndex) => {
+        return value;
+      },
+    }));
+  }, [data, selectedType]);
 
-
-
-    if (selectedType == '1' || selectedType == '2') {
-      if (22 < cellIndex) { return }
-    } else if (selectedType == '3' || selectedType == '4') {
-      if (15 < cellIndex) { return }
-    }
-    
-    if (selectedType == '1' || selectedType == '3') {
-    if (cellIndex < 6) {
-      document.querySelector('tbody tr:nth-child(' + (rowIndex + 1) + ')').classList.toggle('border-primary');
-      return;
-    }
-    } else if (selectedType == '2' || selectedType == '4') {
-    if (cellIndex < 4) {
-      document.querySelector('tbody tr:nth-child(' + (rowIndex + 1) + ')').classList.toggle('border-primary');
-      return;
-    }
-    }
-    
-
-
-    if (toggleColumn === cellIndex) {
-      setToggleColumn(null);
-    } else {
-      setToggleColumn(cellIndex);
-    }
-
-
-  };
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+  } = useTable(
+    {
+      columns,
+      data: filteredData,
+    },
+    useSortBy
+  );
 
   const handleButtonClick = async () => {
     fetchData(selectedType).then(() => {
@@ -118,6 +129,13 @@ const CSVViewer = () => {
     );
   };
 
+  const formatTimeDifference = (difference) => {
+    const hours = Math.floor(difference / (1000 * 60 * 60));
+    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="container mx-auto p-4">
       <div className="flex">
@@ -143,59 +161,55 @@ const CSVViewer = () => {
       </div>
       {flashMessage && (
         <div role="alert" className="alert alert-success">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 shrink-0 stroke-current"
-          fill="none"
-          viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span>{flashMessage}</span>
-      </div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 shrink-0 stroke-current"
+            fill="none"
+            viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{flashMessage}</span>
+        </div>
       )}
       <div className="overflow-x-auto">
-        <table className="table min-w-full">
+        <table {...getTableProps()} className="table min-w-full">
           <thead>
-            <tr className="">
-              {headers.map((header, index) => (
-                <th
-                  key={index}
-                  className="text-left"
-                >
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData.map((row, rowIndex) => (
-              <tr
-                key={rowIndex}
-                className={`hover ${rowIndex % 2 === 0 ? 'bg-base-200' : ''}`}
-              >
-                {headers.map((header, cellIndex) => (
-                  <td
-                    key={cellIndex}
-                    className={`whitespace-nowrap ${
-                      row[header] === '女' ? 'text-secondary' : ''
-                    }`}
-                    onClick={() => handleCellClick(rowIndex, cellIndex)}
-                  >
-                    {toggleColumn === cellIndex && cellIndex > 0 ? (
-                      <span className='text-secondary'>
-                        {formatTimeDifference(calculateTimeDifference(row, cellIndex))} (lap)
-                      </span>
-                    ) : (
-                      row[header]
-                    )}
-                  </td>
+            {headerGroups.map(headerGroup => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map(column => (
+                  <th {...column.getHeaderProps(column.getSortByToggleProps())} className="text-left">
+                    {column.render('Header')}
+                    <span>
+                      {column.isSorted
+                        ? column.isSortedDesc
+                          ? ' 🔽'
+                          : ' 🔼'
+                        : ''}
+                    </span>
+                  </th>
                 ))}
               </tr>
             ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row, rowIndex) => {
+              prepareRow(row);
+              return (
+                <tr {...row.getRowProps()} className={`hover ${rowIndex % 2 === 0 ? 'bg-base-200' : ''}`}>
+                  {row.cells.map(cell => {
+                    return (
+                      <td {...cell.getCellProps()} className="whitespace-nowrap">
+                        {cell.render('Cell')}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
