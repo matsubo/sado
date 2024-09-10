@@ -1,9 +1,8 @@
 # Sado triathlon 2024 athlete tracker
 
-Athelete tracer for Sado Triathlon 2024.
+Athelete tracker for Sado Triathlon 2024.
 
 ## Screenshot
-
 
 <img width="909" alt="image" src="https://github.com/user-attachments/assets/2f4c2ea9-1163-4c82-9e47-bf0bb043c388">
 
