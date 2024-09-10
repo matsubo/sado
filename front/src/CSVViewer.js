@@ -72,38 +72,6 @@ const CSVViewer = () => {
           return <span className="text-secondary">{value}</span>;
         }
 
-        if ((selectedType === '1' || selectedType === '2') && cellIndex > 22) {
-          return value;
-        }
-        if ((selectedType === '3' || selectedType === '4') && cellIndex > 15) {
-          return value;
-        }
-
-        if ((selectedType === '1' || selectedType === '3') && cellIndex < 6) {
-          return value;
-        }
-        if ((selectedType === '2' || selectedType === '4') && cellIndex < 4) {
-          return value;
-        }
-
-        if (cellIndex > 0) {
-          const row = Object.values(filteredData[rowIndex]);
-          const previousTime = dayjs('2024-09-01 ' + row[cellIndex - 1]);
-          const currentTime = dayjs('2024-09-01 ' + value);
-          const difference = currentTime - previousTime;
-          const formattedDifference = formatTimeDifference(difference);
-          
-          return (
-            <span>
-              {value}
-              <br />
-              <span className="text-secondary">
-                {formattedDifference} (lap)
-              </span>
-            </span>
-          );
-        }
-
         return value;
       },
     }));
