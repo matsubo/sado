@@ -204,13 +204,11 @@ const CSVViewer = () => {
                 {headerGroup.headers.map(column => (
                   <th {...column.getHeaderProps(column.getSortByToggleProps())} className="text-left">
                     {column.render('Header')}
-                    <span>
                       {column.isSorted
                         ? column.isSortedDesc
-                          ? ' 🔽'
-                          : ' 🔼'
+                          ? <span className="material-symbols-outlined text-sm text-primary">keyboard_arrow_down</span>
+                          : <span className="material-symbols-outlined text-sm text-primary">keyboard_arrow_up</span>
                         : ''}
-                    </span>
                   </th>
                 ))}
               </tr>
