@@ -10,6 +10,7 @@ const CSVViewer = () => {
     return localStorage.getItem('csvViewerSearchTerm') || '';
   });
   const [flashMessage, setFlashMessage] = useState('');
+  const [highlightedRows, setHighlightedRows] = useState(new Set());
 
   const fetchData = async (type) => {
     const timestamp = Math.floor((new Date().getTime()/(1000*60)));
@@ -44,12 +45,10 @@ const CSVViewer = () => {
       const a = rowA.values[columnId];
       const b = rowB.values[columnId];
 
-      // 空の値をソートの最後に
       if (a === '' && b === '') return 0;
       if (a === '') return 1;
       if (b === '') return -1;
 
-      // 通常のソート
       let a_time = dayjs('2024-09-01 ' + a).unix();
       let b_time = dayjs('2024-09-01 ' + b).unix();
       if (a_time < b_time) return desc ? 1 : -1;
@@ -58,23 +57,42 @@ const CSVViewer = () => {
     },
   };
 
+  const toggleHighlight = (rowIndex) => {
+    setHighlightedRows(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(rowIndex)) {
+        newSet.delete(rowIndex);
+      } else {
+        newSet.add(rowIndex);
+      }
+      return newSet;
+    });
+  };
+
   const columns = useMemo(() => {
     if (data.length === 0) return [];
-    return Object.keys(data[0]).map(key => ({
+    return Object.keys(data[0]).map((key, index) => ({
       Header: key,
       accessor: key,
       sortType: 'alphanumeric',
-      Cell: ({ value, cell }) => {
-
+      Cell: ({ value, row }) => {
+        if (index < 3) {
+          return (
+            <span
+              className="cursor-pointer"
+              onClick={() => toggleHighlight(row.index)}
+            >
+              {value}
+            </span>
+          );
+        }
         if (value === '女') {
           return <span className="text-secondary">{value}</span>;
         }
-
         return value;
       },
     }));
-
- }, [data, selectedType]);
+  }, [data, selectedType]);
 
   const {
     getTableProps,
@@ -117,7 +135,6 @@ const CSVViewer = () => {
     );
   };
 
-
   return (
     <div className="container mx-auto p-4">
       <div className="flex">
@@ -155,11 +172,11 @@ const CSVViewer = () => {
                 {headerGroup.headers.map(column => (
                   <th {...column.getHeaderProps(column.getSortByToggleProps())} className="text-left">
                     {column.render('Header')}
-                      {column.isSorted
-                        ? column.isSortedDesc
-                          ? <span className="material-symbols-outlined text-sm text-primary">keyboard_arrow_down</span>
-                          : <span className="material-symbols-outlined text-sm text-primary">keyboard_arrow_up</span>
-                        : ''}
+                    {column.isSorted
+                      ? column.isSortedDesc
+                        ? <span className="material-symbols-outlined text-sm text-primary">keyboard_arrow_down</span>
+                        : <span className="material-symbols-outlined text-sm text-primary">keyboard_arrow_up</span>
+                      : ''}
                   </th>
                 ))}
               </tr>
@@ -169,14 +186,17 @@ const CSVViewer = () => {
             {rows.map((row, rowIndex) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()} className={`hover ${rowIndex % 2 === 0 ? 'bg-base-200' : ''}`}>
-                  {row.cells.map(cell => {
-                    return (
-                      <td {...cell.getCellProps()} className="whitespace-nowrap">
-                        {cell.render('Cell')}
-                      </td>
-                    );
-                  })}
+                <tr
+                  {...row.getRowProps()}
+                  className={`hover ${rowIndex % 2 === 0 ? 'bg-base-200' : ''} ${
+                    highlightedRows.has(rowIndex) ? 'border-y-blue-300 border-b-1' : ''
+                  }`}
+                >
+                  {row.cells.map(cell => (
+                    <td {...cell.getCellProps()} className="whitespace-nowrap">
+                      {cell.render('Cell')}
+                    </td>
+                  ))}
                 </tr>
               );
             })}
