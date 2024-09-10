@@ -61,7 +61,7 @@ const CSVViewer = () => {
 
   const handleCellClick = (rowIndex, cellIndex) => {
 
-    if (cellIndex < 5) {
+    if (cellIndex < 6) {
       document.querySelector('tbody tr:nth-child(' + (rowIndex + 1) + ')').classList.toggle('border-primary');
     }
 
