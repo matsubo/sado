@@ -61,16 +61,27 @@ const CSVViewer = () => {
 
   const handleCellClick = (rowIndex, cellIndex) => {
 
-    if (cellIndex < 6) {
-      document.querySelector('tbody tr:nth-child(' + (rowIndex + 1) + ')').classList.toggle('border-primary');
-      return;
-    }
+
 
     if (selectedType == '1' || selectedType == '2') {
       if (22 < cellIndex) { return }
     } else if (selectedType == '3' || selectedType == '4') {
       if (15 < cellIndex) { return }
     }
+    
+    if (selectedType == '1' || selectedType == '3') {
+    if (cellIndex < 6) {
+      document.querySelector('tbody tr:nth-child(' + (rowIndex + 1) + ')').classList.toggle('border-primary');
+      return;
+    }
+    } else if (selectedType == '2' || selectedType == '4') {
+    if (cellIndex < 4) {
+      document.querySelector('tbody tr:nth-child(' + (rowIndex + 1) + ')').classList.toggle('border-primary');
+      return;
+    }
+    }
+    
+
 
     if (toggleColumn === cellIndex) {
       setToggleColumn(null);
