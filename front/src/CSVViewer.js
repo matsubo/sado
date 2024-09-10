@@ -61,11 +61,10 @@ const CSVViewer = () => {
 
   const handleCellClick = (rowIndex, cellIndex) => {
 
-    if (cellIndex < 4) {
+    if (cellIndex < 5) {
       document.querySelector('tbody tr:nth-child(' + (rowIndex + 1) + ')').classList.toggle('border-primary');
     }
 
-    if (cellIndex < 5) { return }
     if (selectedType == '1' || selectedType == '2') {
       if (22 < cellIndex) { return }
     } else if (selectedType == '3' || selectedType == '4') {
