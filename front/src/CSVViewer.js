@@ -11,7 +11,7 @@ const CSVViewer = () => {
   });
   const [flashMessage, setFlashMessage] = useState('');
   const [highlightedRows, setHighlightedRows] = useState(new Set());
-  const [timeDifferences, setTimeDifferences] = useState({});
+  const [showTimeDifferences, setShowTimeDifferences] = useState(false);
 
   const fetchData = async (type) => {
     const timestamp = Math.floor((new Date().getTime()/(1000*60)));
@@ -71,6 +71,7 @@ const CSVViewer = () => {
   };
 
   const calculateTimeDifference = (time1, time2) => {
+    if (!time1 || !time2) return null;
     const date1 = dayjs('2024-09-01 ' + time1);
     const date2 = dayjs('2024-09-01 ' + time2);
     const diffInSeconds = date2.diff(date1, 'second');
@@ -79,22 +80,13 @@ const CSVViewer = () => {
     const seconds = diffInSeconds % 60;
     return (
       <span className="text-primary">
-      +{hours}:{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
+        +{hours}:{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
       </span>
     );
   };
 
-  const toggleTimeDifference = (rowIndex, columnIndex) => {
-    setTimeDifferences(prev => {
-      const key = `${rowIndex}-${columnIndex}`;
-      const newDifferences = { ...prev };
-      if (newDifferences[key]) {
-        delete newDifferences[key];
-      } else {
-        newDifferences[key] = true;
-      }
-      return newDifferences;
-    });
+  const toggleAllTimeDifferences = () => {
+    setShowTimeDifferences(prev => !prev);
   };
 
   const columns = useMemo(() => {
@@ -115,15 +107,14 @@ const CSVViewer = () => {
           );
         }
         if (index >= 6 && index <= 22) {
-          const timeDiffKey = `${row.index}-${column.id}`;
-          const showDiff = timeDifferences[timeDiffKey];
-          const prevColumnValue = row.values[Object.keys(row.values)[index - 1]];
           return (
             <span
               className="cursor-pointer"
-              onClick={() => toggleTimeDifference(row.index, column.id)}
+              onClick={toggleAllTimeDifferences}
             >
-              {showDiff ? calculateTimeDifference(prevColumnValue, value) : value}
+              {showTimeDifferences
+                ? calculateTimeDifference(row.values[Object.keys(row.values)[index - 1]], value)
+                : value}
             </span>
           );
         }
@@ -133,7 +124,7 @@ const CSVViewer = () => {
         return value;
       },
     }));
-  }, [data, selectedType, timeDifferences]);
+  }, [data, selectedType, showTimeDifferences]);
 
   const {
     getTableProps,
