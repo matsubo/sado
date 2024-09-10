@@ -63,6 +63,7 @@ const CSVViewer = () => {
 
     if (cellIndex < 6) {
       document.querySelector('tbody tr:nth-child(' + (rowIndex + 1) + ')').classList.toggle('border-primary');
+      return;
     }
 
     if (selectedType == '1' || selectedType == '2') {
