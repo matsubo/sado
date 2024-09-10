@@ -42,5 +42,6 @@ base_url = "https://systemway.jp/24sado"
 
 for di in range(1, 5):
     combined_data = get_all_pages_data(base_url, di)
+    combined_data.columns = combined_data.columns.str.replace('No.', 'No')
     combined_data.to_csv(f"combined_table_data_{di}.csv", index=False, encoding='utf-8-sig')
 
