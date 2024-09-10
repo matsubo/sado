@@ -11,6 +11,7 @@ const CSVViewer = () => {
   });
   const [flashMessage, setFlashMessage] = useState('');
   const [highlightedRows, setHighlightedRows] = useState(new Set());
+  const [timeDifferences, setTimeDifferences] = useState({});
 
   const fetchData = async (type) => {
     const timestamp = Math.floor((new Date().getTime()/(1000*60)));
@@ -69,13 +70,40 @@ const CSVViewer = () => {
     });
   };
 
+  const calculateTimeDifference = (time1, time2) => {
+    const date1 = dayjs('2024-09-01 ' + time1);
+    const date2 = dayjs('2024-09-01 ' + time2);
+    const diffInSeconds = date2.diff(date1, 'second');
+    const hours = Math.floor(diffInSeconds / 3600);
+    const minutes = Math.floor((diffInSeconds % 3600) / 60);
+    const seconds = diffInSeconds % 60;
+    return (
+      <span className="text-primary">
+      +{hours}:{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
+      </span>
+    );
+  };
+
+  const toggleTimeDifference = (rowIndex, columnIndex) => {
+    setTimeDifferences(prev => {
+      const key = `${rowIndex}-${columnIndex}`;
+      const newDifferences = { ...prev };
+      if (newDifferences[key]) {
+        delete newDifferences[key];
+      } else {
+        newDifferences[key] = true;
+      }
+      return newDifferences;
+    });
+  };
+
   const columns = useMemo(() => {
     if (data.length === 0) return [];
     return Object.keys(data[0]).map((key, index) => ({
       Header: key,
       accessor: key,
       sortType: 'alphanumeric',
-      Cell: ({ value, row }) => {
+      Cell: ({ value, row, column }) => {
         if (index < 3) {
           return (
             <span
@@ -86,13 +114,26 @@ const CSVViewer = () => {
             </span>
           );
         }
+        if (index >= 6 && index <= 22) {
+          const timeDiffKey = `${row.index}-${column.id}`;
+          const showDiff = timeDifferences[timeDiffKey];
+          const prevColumnValue = row.values[Object.keys(row.values)[index - 1]];
+          return (
+            <span
+              className="cursor-pointer"
+              onClick={() => toggleTimeDifference(row.index, column.id)}
+            >
+              {showDiff ? calculateTimeDifference(prevColumnValue, value) : value}
+            </span>
+          );
+        }
         if (value === '女') {
           return <span className="text-secondary">{value}</span>;
         }
         return value;
       },
     }));
-  }, [data, selectedType]);
+  }, [data, selectedType, timeDifferences]);
 
   const {
     getTableProps,
@@ -189,7 +230,7 @@ const CSVViewer = () => {
                 <tr
                   {...row.getRowProps()}
                   className={`hover ${rowIndex % 2 === 0 ? 'bg-base-200' : ''} ${
-                    highlightedRows.has(rowIndex) ? 'border-y-blue-300 border-b-1' : ''
+                    highlightedRows.has(rowIndex) ? 'border-y-blue-300 border-y-2' : ''
                   }`}
                 >
                   {row.cells.map(cell => (
