@@ -44,12 +44,10 @@ const CSVViewer = () => {
       const a = rowA.values[columnId];
       const b = rowB.values[columnId];
 
-      // 空の値をソートの最後に
       if (a === '' && b === '') return 0;
       if (a === '') return 1;
       if (b === '') return -1;
 
-      // 通常のソート
       let a_time = dayjs('2024-09-01 ' + a).unix();
       let b_time = dayjs('2024-09-01 ' + b).unix();
       if (a_time < b_time) return desc ? 1 : -1;
@@ -64,18 +62,15 @@ const CSVViewer = () => {
       Header: key,
       accessor: key,
       sortType: 'alphanumeric',
-      Cell: ({ value, cell }) => {
-        const rowIndex = cell.row.index;
-        const cellIndex = cell.column.index;
-
+      Cell: ({ value }) => {
+        if (value === null || value === undefined) return '';
         if (value === '女') {
           return <span className="text-secondary">{value}</span>;
         }
-
-        return value;
+        return value.toString();
       },
     }));
-  }, [data, selectedType]);
+  }, [data]);
 
   const {
     getTableProps,
@@ -118,13 +113,6 @@ const CSVViewer = () => {
     );
   };
 
-  const formatTimeDifference = (difference) => {
-    const hours = Math.floor(difference / (1000 * 60 * 60));
-    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
-
   return (
     <div className="container mx-auto p-4">
       <div className="flex">
@@ -150,17 +138,7 @@ const CSVViewer = () => {
       </div>
       {flashMessage && (
         <div role="alert" className="alert alert-success">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 shrink-0 stroke-current"
-            fill="none"
-            viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <span className="material-symbols-outlined">info</span>
           <span>{flashMessage}</span>
         </div>
       )}
@@ -172,11 +150,11 @@ const CSVViewer = () => {
                 {headerGroup.headers.map(column => (
                   <th {...column.getHeaderProps(column.getSortByToggleProps())} className="text-left">
                     {column.render('Header')}
-                      {column.isSorted
-                        ? column.isSortedDesc
-                          ? <span className="material-symbols-outlined text-sm text-primary">keyboard_arrow_down</span>
-                          : <span className="material-symbols-outlined text-sm text-primary">keyboard_arrow_up</span>
-                        : ''}
+                    {column.isSorted
+                      ? column.isSortedDesc
+                        ? <span className="material-symbols-outlined text-sm text-primary">keyboard_arrow_down</span>
+                        : <span className="material-symbols-outlined text-sm text-primary">keyboard_arrow_up</span>
+                      : ''}
                   </th>
                 ))}
               </tr>
@@ -187,13 +165,11 @@ const CSVViewer = () => {
               prepareRow(row);
               return (
                 <tr {...row.getRowProps()} className={`hover ${rowIndex % 2 === 0 ? 'bg-base-200' : ''}`}>
-                  {row.cells.map(cell => {
-                    return (
-                      <td {...cell.getCellProps()} className="whitespace-nowrap">
-                        {cell.render('Cell')}
-                      </td>
-                    );
-                  })}
+                  {row.cells.map(cell => (
+                    <td {...cell.getCellProps()} className="whitespace-nowrap">
+                      {cell.render('Cell')}
+                    </td>
+                  ))}
                 </tr>
               );
             })}
